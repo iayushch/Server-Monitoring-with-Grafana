@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { json } from 'stream/consumers';
+import { doSomeHeavyTask } from './utils.js';
 
 const app = express();
 app.use(express.json());
