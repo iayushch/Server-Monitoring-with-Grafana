@@ -1,11 +1,14 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import client from 'prom-client';  // Metrics Collector
 import { doSomeHeavyTask } from './utils.js';
 
 const app = express();
 app.use(express.json());
 dotenv.config();
 
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({register: client.register});
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Server is running' });
@@ -24,6 +27,12 @@ app.get('/slow',async (req, res) => {
             message: error.message
         });
     }
+});
+
+app.get('/metrics', async (req, res) => {
+    res.setHeader('Content-Type', client.register.contentType);
+    const metrics = await client.register.metrics();
+    res.send(metrics);
 });
 
 app.listen(process.env.PORT, () => {
